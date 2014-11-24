@@ -1,0 +1,3 @@
+access: https://login.salesforce.com/services/oauth2/token
+authorize: https://login.salesforce.com/services/oauth2/authorize
+scopes: id

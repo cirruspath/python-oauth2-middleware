@@ -1,0 +1,8 @@
+include LICENSE
+include requirements.txt
+include *.md
+include pom/keys/*
+recursive-include pom/config *
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *~
