@@ -19,6 +19,7 @@
 from flask import Flask, request, redirect, url_for
 import json
 import os
+from pom.triggers.poster import Poster
 from pom.triggers.github import GitHub
 from pom.triggers.salesforce import Salesforce
 from pom.clients.oauth2 import OAuth2
@@ -59,6 +60,8 @@ if 'triggers' in config:
             triggers.append(GitHub())
         elif t == "salesforce": 
             triggers.append(Salesforce())
+        elif t == "poster": 
+            triggers.append(Poster())
 else:
     trigger_list = []
 #
@@ -111,8 +114,6 @@ def _get_access_token(source, auth_code, state, session):
         res = requests.post(source.access_token_url, 
                             data = payload,
                             headers = headers) 
-        print str(res.json())
-        print str(res.text)
 
         if res.status_code == requests.codes.ok:
             resp_json = res.json()
