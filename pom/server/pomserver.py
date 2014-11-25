@@ -100,15 +100,20 @@ def _get_access_token(source, auth_code, state, session):
     try:
         payload = { 'client_id' : source.consumer_key,
                     'client_secret' : source.consumer_secret,
-                    'code' : auth_code,
                     'grant_type' : 'authorization_code', 
+                    'code' : auth_code,
                     'redirect_uri' : redirect_uri + '/' + source.name} 
-        headers = {'content-type': 'application/json',
-                   'Accept' : 'application/json'}
+
+        headers = {'Accept' : 'application/json'}
         # headers = {'content-type': 'application/x-www-form-urlencoded',
         #            'content-length' : 256}
 
-        res = requests.post(source.access_token_url, params=payload, headers = headers) 
+        res = requests.post(source.access_token_url, 
+                            data = payload,
+                            headers = headers) 
+        print str(res.json())
+        print str(res.text)
+
         if res.status_code == requests.codes.ok:
             resp_json = res.json()
 
