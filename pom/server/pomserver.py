@@ -97,9 +97,14 @@ def authorize():
 
     responses[state] = { 'stage' : 'authorize',
                          'session' : session }
+
+    if 'redirect' in request.args:
+        responses[state]['redirect'] = request.args['redirect']
+        print "Using the %s user redirect" % responses[state]['redirect']
+    
     return redirect(url)
 
-def _get_access_token(source, auth_code, state, session):
+def _get_access_token(source, auth_code, state, session, redirect=None):
     try:
         payload = { 'client_id' : source.consumer_key,
                     'client_secret' : source.consumer_secret,
@@ -119,13 +124,22 @@ def _get_access_token(source, auth_code, state, session):
             resp_json = res.json()
 
             if 'access_token' in resp_json:
+                resp = None
+
+                if redirect:
+                    resp_json['_user_redirect'] = redirect
+
                 for t in triggers:
-                    t.consume_access_key(resp_json)
+                    resp = t.consume_access_key(resp_json)
 
                 responses[state] = { 'stage' : 'authorized',
                                      'resp' : resp_json }
-                return json.dumps( {'status' : 'authorized',
-                                    'session' : session } )
+
+                if resp:
+                    return resp.text
+                else:
+                    return json.dumps( {'status' : 'authorized',
+                                        'session' : session } )
             else:
                 error_msg = "unauthorized"
         else:
@@ -150,8 +164,13 @@ def callback(source_name):
         state = request.args["state"]
         session = responses[state]['session']
 
-        responses[state] = { 'stage' : 'callback' }
-        return _get_access_token(source, auth_code, state, session)
+        if 'redirect' in responses[state]:
+            redirect = responses[state]['redirect']
+        else:
+            redirect = None
+
+        responses[state]['stage'] = 'callback'
+        return _get_access_token(source, auth_code, state, session, redirect)
     else:
         return json.dumps( {'status' : 'failed',
                             'error' : 'authentication' } )

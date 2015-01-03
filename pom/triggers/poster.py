@@ -30,7 +30,7 @@ class Poster(object):
         if self.service_uri:
             try:
                 print "Relaying to " + self.service_uri
-                requests.post(self.service_uri, data = response)
+                return requests.post(self.service_uri, data = response)
             except:
                 print "Could not relay access token"
                 

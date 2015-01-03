@@ -1,3 +1,3 @@
 access: https://accounts.google.com/o/oauth2/token
 authorize: https://accounts.google.com/o/oauth2/auth
-scopes: https://www.googleapis.com/auth/gmail.modify
+scopes: https://www.googleapis.com/auth/gmail.modify https://www.googleapis.com/auth/contacts.readonly https://spreadsheets.google.com/feeds
