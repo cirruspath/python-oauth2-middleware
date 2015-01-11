@@ -91,6 +91,7 @@ def authorize():
     payload = { 'client_id' : source.consumer_key,
                 'scope' : source.scopes,
                 'response_type' : 'code', 
+                'access_type' : 'offline', 
                 'state' : state, 
                 'redirect_uri' : redirect_uri + '/' + source.name}
     url = source.authorize_url + "?" + urllib.urlencode(payload)
