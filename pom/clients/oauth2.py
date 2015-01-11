@@ -32,6 +32,7 @@ class OAuth2(object):
         config = yaml.load(yaml_file)        
         self.access_token_url = config["access"]
         self.authorize_url = config["authorize"]
+        self.token_url = config["token"]
         self.scopes = config["scopes"]
         self.name = os.path.basename(os.path.splitext(config_file)[0])
 

@@ -105,6 +105,23 @@ def authorize():
     
     return redirect(url)
 
+#
+# Fetch a new access token using a refresh token. 
+#
+@app.route('/refresh', methods=['GET'])
+def refresh_access_token():
+    refresh_token = request.args['refresh']
+    source = providers[request.args['source']]
+
+    print "refreshing with " + refresh_token
+    payload = { 'client_id' : source.consumer_key,
+                'client_secret' : source.consumer_secret, 
+                'grant_type' : 'authorization_code', 
+                'refesh_token' : refresh_token }
+
+    resp = requests.post(source.token_url, params = payload)
+    return resp.text
+                        
 def _get_access_token(source, auth_code, state, session, redirect=None):
     try:
         payload = { 'client_id' : source.consumer_key,
