@@ -1,3 +1,4 @@
+revoke: https://github.com/login/oauth/revoke
 token: https://github.com/login/oauth/access_token
 access: https://github.com/login/oauth/access_token
 authorize: https://github.com/login/oauth/authorize

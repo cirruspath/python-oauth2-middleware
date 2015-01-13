@@ -1,3 +1,4 @@
+revoke: https://accounts.google.com/o/oauth2/revoke
 token: https://www.googleapis.com/oauth2/v3/token
 access: https://accounts.google.com/o/oauth2/token
 authorize: https://accounts.google.com/o/oauth2/auth

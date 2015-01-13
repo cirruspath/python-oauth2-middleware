@@ -88,14 +88,14 @@ def authorize():
         print "Using the Salesforce OAuth server"
         source = providers["salesforce"]
 
-    payload = { 'client_id' : source.consumer_key,
-                'scope' : source.scopes,
-                'response_type' : 'code', 
-                'access_type' : 'offline', 
+    payload = { 'scope' : source.scopes,
                 'state' : state, 
-                'redirect_uri' : redirect_uri + '/' + source.name}
-    url = source.authorize_url + "?" + urllib.urlencode(payload)
+                'redirect_uri' : redirect_uri + '/' + source.name,
+                'response_type' : 'code', 
+                'client_id' : source.consumer_key,
+                'access_type' : 'offline'}
 
+    url = source.authorize_url + "?" + urllib.urlencode(payload)
     responses[state] = { 'stage' : 'authorize',
                          'session' : session }
 
@@ -104,6 +104,18 @@ def authorize():
         print "Using the %s user redirect" % responses[state]['redirect']
     
     return redirect(url)
+
+#
+# Fetch a new access token using a refresh token. 
+#
+@app.route('/refresh', methods=['DELETE'])
+def revoke_access_token():
+    refresh_token = request.args['refresh']
+    source = providers[request.args['source']]
+    payload = { 'token' : refresh_token }
+
+    resp = requests.post(source.revoke_url, params = payload)
+    return resp.text
 
 #
 # Fetch a new access token using a refresh token. 
@@ -140,6 +152,7 @@ def _get_access_token(source, auth_code, state, session, redirect=None):
 
         if res.status_code == requests.codes.ok:
             resp_json = res.json()
+            print "JSON response: " + str(resp_json)
 
             if 'access_token' in resp_json:
                 resp = None
@@ -217,12 +230,14 @@ def main():
         exit(1)
 
     print "Using SSL certificate in " + key_dir
-    http_server = HTTPServer(WSGIContainer(app),
-                             ssl_options={
-                                 "certfile": key_dir + "/server.crt",
-                                 "keyfile": key_dir + "/server.key",
-                             })
-
-    http_server.listen(port=int(sys.argv[2]),
-                       address=sys.argv[1])
-    IOLoop.instance().start()
+    try:
+        http_server = HTTPServer(WSGIContainer(app),
+                                 ssl_options={
+                                     "certfile": key_dir + "/server.crt",
+                                     "keyfile": key_dir + "/server.key",
+                                 })
+        http_server.listen(port=int(sys.argv[2]),
+                           address=sys.argv[1])
+        IOLoop.instance().start()
+    except:
+        pass

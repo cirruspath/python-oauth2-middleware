@@ -30,6 +30,8 @@ class OAuth2(object):
     def _read_key_info(self, config_file):
         yaml_file = open(config_file, 'r')
         config = yaml.load(yaml_file)        
+
+        self.revoke_url = config["revoke"]
         self.access_token_url = config["access"]
         self.authorize_url = config["authorize"]
         self.token_url = config["token"]
