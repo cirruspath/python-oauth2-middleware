@@ -83,7 +83,7 @@ def authorize():
 
     if 'source' in request.args:
         source = providers[request.args['source']]
-        print "Using the %s OAuth server" % source
+        print "Using the %s OAuth server" % request.args['source']
     else:
         print "Using the Salesforce OAuth server"
         source = providers["salesforce"]
@@ -128,8 +128,8 @@ def refresh_access_token():
     print "refreshing with " + refresh_token
     payload = { 'client_id' : source.consumer_key,
                 'client_secret' : source.consumer_secret, 
-                'grant_type' : 'authorization_code', 
-                'refesh_token' : refresh_token }
+                'grant_type' : 'refresh_token', 
+                'refresh_token' : refresh_token }
 
     resp = requests.post(source.token_url, params = payload)
     return resp.text
@@ -140,6 +140,7 @@ def _get_access_token(source, auth_code, state, session, redirect=None):
                     'client_secret' : source.consumer_secret,
                     'grant_type' : 'authorization_code', 
                     'code' : auth_code,
+                    'source' : source, 
                     'redirect_uri' : redirect_uri + '/' + source.name} 
 
         headers = {'Accept' : 'application/json'}
@@ -157,9 +158,9 @@ def _get_access_token(source, auth_code, state, session, redirect=None):
             if 'access_token' in resp_json:
                 resp = None
 
+                resp_json['source'] = source                
                 if redirect:
                     resp_json['_user_redirect'] = redirect
-
                 for t in triggers:
                     resp = t.consume_access_key(resp_json)
 
