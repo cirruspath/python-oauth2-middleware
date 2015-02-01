@@ -140,7 +140,6 @@ def _get_access_token(source, auth_code, state, session, redirect=None):
                     'client_secret' : source.consumer_secret,
                     'grant_type' : 'authorization_code', 
                     'code' : auth_code,
-                    'source' : source, 
                     'redirect_uri' : redirect_uri + '/' + source.name} 
 
         headers = {'Accept' : 'application/json'}
@@ -158,7 +157,7 @@ def _get_access_token(source, auth_code, state, session, redirect=None):
             if 'access_token' in resp_json:
                 resp = None
 
-                resp_json['source'] = source                
+                resp_json['source'] = source.name
                 if redirect:
                     resp_json['_user_redirect'] = redirect
                 for t in triggers:
